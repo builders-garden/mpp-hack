@@ -42,8 +42,19 @@ export async function handleSend(
   }
 
   // 3. Check balance
-  const balance = await deps.getBalance(sender.address as `0x${string}`);
-  if (parseFloat(balance) < parseFloat(amount)) {
+  let balance: string;
+  try {
+    balance = await deps.getBalance(sender.address as `0x${string}`);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    console.error("Failed to fetch balance:", err);
+    return `Could not retrieve your balance: ${msg}`;
+  }
+
+  // Use epsilon comparison to handle floating-point precision (PathUSD has 6 decimals)
+  const balanceNum = parseFloat(balance);
+  const amountNum = parseFloat(amount);
+  if (balanceNum - amountNum < -1e-9) {
     return `Insufficient balance. You have $${balance} but tried to send $${amount}.`;
   }
 
