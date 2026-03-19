@@ -28,11 +28,9 @@ export function createUser(
   privyWalletId: string,
   address: string
 ): User {
-  db.run(
-    "INSERT INTO users (phone, privy_wallet_id, address) VALUES (?, ?, ?)",
-    [phone, privyWalletId, address]
-  );
-  return getUser(db, phone)!;
+  return db.query<User, [string, string, string]>(
+    "INSERT INTO users (phone, privy_wallet_id, address) VALUES (?, ?, ?) RETURNING *"
+  ).get(phone, privyWalletId, address)!;
 }
 
 export function getAllUsers(db: Database): User[] {

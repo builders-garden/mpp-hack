@@ -3,13 +3,15 @@
 
 import type { Database } from "bun:sqlite";
 
+export type TransactionStatus = 'pending' | 'confirmed' | 'failed';
+
 export interface Transaction {
   id: number;
   from_phone: string;
   to_phone: string;
   amount: string;
   tx_hash: string | null;
-  status: string;
+  status: TransactionStatus;
   error: string | null;
   created_at: string;
 }
@@ -30,7 +32,7 @@ export function logTransaction(
 export function updateTransaction(
   db: Database,
   id: number,
-  update: { txHash?: string; status?: string; error?: string }
+  update: { txHash?: string; status?: TransactionStatus; error?: string }
 ): void {
   const sets: string[] = [];
   const vals: (string | number)[] = [];

@@ -7,6 +7,7 @@ export function initDb(path: string): Database {
   const db = new Database(path, { create: true });
 
   db.run("PRAGMA journal_mode=WAL");
+  db.run("PRAGMA foreign_keys = ON");
 
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
@@ -22,9 +23,9 @@ export function initDb(path: string): Database {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       from_phone TEXT NOT NULL,
       to_phone TEXT NOT NULL,
-      amount TEXT NOT NULL,
+      amount TEXT NOT NULL,  -- stored as decimal string to avoid float precision loss
       tx_hash TEXT,
-      status TEXT NOT NULL DEFAULT 'pending',
+      status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','confirmed','failed')),
       error TEXT,
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       FOREIGN KEY (from_phone) REFERENCES users(phone),
