@@ -17,8 +17,8 @@ export const config = {
     appSecret: required("PRIVY_APP_SECRET"),
   },
   treasury: {
-    walletId: process.env.TREASURY_WALLET_ID || "",
-    address: (process.env.TREASURY_ADDRESS || "") as `0x${string}`,
+    walletId: optional("TREASURY_WALLET_ID", ""),
+    address: optional("TREASURY_ADDRESS", "") as `0x${string}`,
   },
   mpp: {
     serviceUrl: optional(
@@ -27,7 +27,7 @@ export const config = {
     ),
     model: optional("MPP_MODEL", "gpt-4o"),
   },
-  botPhone: process.env.BOT_PHONE || "",
+  botPhone: optional("BOT_PHONE", ""),
   dbPath: optional("DB_PATH", "imessage-pay.db"),
 } as const;
 

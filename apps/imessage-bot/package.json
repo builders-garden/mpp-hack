@@ -1,8 +1,11 @@
 {
   "name": "imessage-bot",
-  "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch src/index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
