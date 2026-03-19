@@ -24,7 +24,9 @@ export function getPrivyClient(): PrivyClient {
 
 export interface PrivyWallet {
   id: string;
-  address: string;
+  // Cast to branded hex type at the boundary — Privy returns string,
+  // but all Tempo/viem APIs require `0x${string}`.
+  address: `0x${string}`;
 }
 
 /**
@@ -34,10 +36,12 @@ export interface PrivyWallet {
  */
 export async function createUserWallet(): Promise<PrivyWallet> {
   const privy = getPrivyClient();
-  const wallet = await privy.wallets().create({ chain_type: "ethereum" });
+  const wallet = await privy.wallets().create({ chain_type: "ethereum" }).catch((err) => {
+    throw new Error(`Failed to create Privy wallet: ${err instanceof Error ? err.message : String(err)}`);
+  });
   return {
     id: wallet.id,
-    address: wallet.address,
+    address: wallet.address as `0x${string}`,
   };
 }
 
@@ -46,6 +50,10 @@ export async function createUserWallet(): Promise<PrivyWallet> {
  * This account can be used with:
  *   - viem wallet clients (for P2P transfers via tempoActions)
  *   - mppx (for MPP-paid service consumption)
+ *
+ * Note: createViemAccount defers validation to Privy's signing API — errors
+ * from an invalid walletId surface only when a transaction is first signed,
+ * not here. No error handling needed at construction time.
  */
 export function getViemAccount(
   walletId: string,
